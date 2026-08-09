@@ -1,0 +1,14 @@
+cat << 'EOF' > .gitignore
+csrc/
+simv*
+*.daidir/
+*.key
+*.vpd
+*.vcd
+*.fsdb
+*.log
+ucli.key
+vc_hdrs.h
+.vlogan*
+.vcs*
+EOF
