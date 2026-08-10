@@ -13,6 +13,7 @@ package fifo_pkg;
     } fifo_op_e;
 
     `include "fifo_transaction.sv"
+    `include "fifo_corrupt_transaction.sv"
     `include "fifo_sequencer.sv"
     `include "fifo_write_driver.sv"
     `include "fifo_write_monitor.sv"
@@ -21,6 +22,7 @@ package fifo_pkg;
     `include "fifo_write_agent.sv"
     `include "fifo_read_agent.sv"
     `include "fifo_scoreboard.sv"
+    `include "fifo_coverage.sv"
     `include "fifo_env.sv"
     `include "fifo_sequence.sv"
     `include "fifo_test.sv"

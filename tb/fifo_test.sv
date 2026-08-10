@@ -28,8 +28,8 @@ class fifo_rand_test extends fifo_base_test;
         phase.raise_objection(this);
         `uvm_info("TEST", "Running Test1: Random Sequence", UVM_LOW)
 
-        w_seq.num_trans = 100;
-        r_seq.num_trans = 100;
+        w_seq.num_trans = 200;
+        r_seq.num_trans = 200;
 
         fork
             w_seq.start(env.w_agent.sqr);
@@ -65,3 +65,17 @@ class fifo_full_empty_test extends fifo_base_test;
 endclass
 
 
+// Test 3: Try corrupt transaction
+class fifo_override_test extends fifo_rand_test;
+    `uvm_component_utils(fifo_override_test)
+
+    function new(string name = "fifo_override_test", uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        fifo_transaction::type_id::set_type_override(fifo_corrupt_transaction::get_type());
+        super.build_phase(phase);
+    endfunction
+
+endclass

@@ -4,6 +4,7 @@ class fifo_write_driver extends uvm_driver #(fifo_transaction);
 
     virtual fifo_if vif;
     fifo_transaction tr;
+    uvm_analysis_port #(fifo_transaction) drv_ap;
 
     function new(string name = "fifo_write_driver", uvm_component parent = null);
         super.new(name, parent);
@@ -13,6 +14,7 @@ class fifo_write_driver extends uvm_driver #(fifo_transaction);
         super.build_phase(phase);
         if(!uvm_config_db#(virtual fifo_if)::get(this, "", "vif", vif))
             `uvm_fatal("NOVIF", "Virtual interface not found in write driver")
+        drv_ap = new("drv_ap", this);
     endfunction
 
     virtual task run_phase(uvm_phase phase);
@@ -23,6 +25,8 @@ class fifo_write_driver extends uvm_driver #(fifo_transaction);
 
         forever begin
             seq_item_port.get_next_item(tr);
+
+            drv_ap.write(tr);
 
             if(tr.op == WRITE_ONLY || tr.op == WRITE_READ) begin
                 repeat (tr.delay) @(vif.w_drv_cb);

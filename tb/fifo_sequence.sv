@@ -8,18 +8,18 @@ class fifo_base_sequence extends uvm_sequence #(fifo_transaction);
         super.new(name);
     endfunction
 
-    task write_data(input bit[DATA_WIDTH-1:0] data, input int delay = 0);
+    task write_data(input bit[DATA_WIDTH-1:0] data);
         req = fifo_transaction::type_id::create("req");
         start_item(req);
-        if(!req.randomize() with {op == WRITE_ONLY; this.data == data; this.delay == delay;})
+        if(!req.randomize() with {op == WRITE_ONLY; this.data == data;})
             `uvm_fatal("SEQ", "Randomization failed")
         finish_item(req);
     endtask
 
-    task read_data(input int delay = 0);
+    task read_data();
         req = fifo_transaction::type_id::create("req");
         start_item(req);
-        if(!req.randomize() with {op == READ_ONLY; this.delay == delay;})
+        if(!req.randomize() with {op == READ_ONLY;})
             `uvm_fatal("SEQ", "Randomization failed")
         finish_item(req);
     endtask
@@ -51,7 +51,7 @@ class fifo_read_sequence extends fifo_base_sequence;
 
     virtual task body();
         repeat(num_trans) begin
-            read_data($urandom());
+            read_data();
         end
     endtask
 endclass
