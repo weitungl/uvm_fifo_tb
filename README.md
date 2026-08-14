@@ -27,10 +27,17 @@ and dynamic factory overrides for error/pattern injection.
 * **fifo_override_test**: Uses UVM Factory Type Override to inject custom data patterns and fixed delays without altering existing testbench settings.
 
 ## Verification Results
-The testbench successfully achieved 100.00% Functional Coverage:
-* cp_op (100.00%): Fully covered both write_op and read_op transactions.
-* cp_delay (100.00%): Verified all timing delay bins (zero_delay, short_delay, and long_delay).
-* cross_op_delay (100.00%): Achieved 100% coverage across all cross-bins between operation types and delay conditions.
+### 1. Data Integrity & Scoreboard Checking
+The dynamic self-checking scoreboard verified the correctness of data flow across all test cases:
+* **Zero Data Mismatch**: 100% data integrity verified for all popped transactions against the expected golden queue.
+* **In-Order Delivery**: Confirmed strict FIFO order with zero protocol or data corruption under random read/write delays.
+* **Drain & Boundary Verification**: Confirmed complete FIFO drain (zero residual data) and verified correct `full`/`empty` flag behavior during the directed `fifo_full_empty_test`.
+* **Zero UVM Errors**: Successfully passed all randomized and directed tests with 0 `UVM_ERROR` and 0 `UVM_FATAL` reports.
+### 2. Functional Coverage
+The testbench achieved **100.00% Functional Coverage**:
+* `cp_op` (**100.00%**): Fully covered both `write_op` and `read_op` transactions.
+* `cp_delay` (**100.00%**): Verified all timing delay bins (zero_delay, short_delay, and long_delay).
+* `cross_op_delay` (**100.00%**): Achieved 100% coverage across all cross-bins between operation types and delay conditions.
 
 ## How to Run
 **Requirements**
