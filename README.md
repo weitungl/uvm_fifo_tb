@@ -4,7 +4,7 @@ The testbench features constrained-random stimulus generation, full TLM architec
 and dynamic factory overrides for error/pattern injection.
 
 ## Testbench Architecture
-<img width="829" height="575" alt="截圖 2026-08-10 晚上9 44 04" src="https://github.com/user-attachments/assets/ef1ddb66-74d6-4783-b039-82730176d9f8" />
+<img width="1364" height="1134" alt="image" src="https://github.com/user-attachments/assets/1449fe7e-50a3-4651-9b44-0721e14e50cd" />
 
 ## Key Highlights
 * **Dual Active Agents**: Independent write and read agents, each containing a Sequencer, Driver, and Monitor.
@@ -41,6 +41,7 @@ The scoreboard uses an in-order reference queue to predict expected read data an
 ### 2. Coverage
 * **Code Coverage**: 100%
 * **Functional Coverage**: 100%
+
 Functional coverage includes transaction types, delay combinations, FIFO status, and simultaneous read/write scenarios.
 
 ## How to Run
