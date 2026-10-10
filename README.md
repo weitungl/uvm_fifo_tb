@@ -7,54 +7,69 @@ and dynamic factory overrides for error/pattern injection.
 <img width="829" height="575" alt="截圖 2026-08-10 晚上9 44 04" src="https://github.com/user-attachments/assets/ef1ddb66-74d6-4783-b039-82730176d9f8" />
 
 ## Key Highlights
-* **Active Agents**: Separate write_agent and read_agent, each instantiating its own Sequencer, Driver, and Monitor.
-* **Constrained-Random Verification (CRV)**: Randomized write/read transactions with varying delays (zero_delay, short_delay, long_delay).
-* **Scoreboard Integration**: Automatic data checking using UVM TLM exports.
-* **Functional Coverage Component**: Direct coverage sampling from Driver transactions (cp_op, cp_delay, and cross_op_delay).
-* **Factory Type Override**: Demonstrates dynamic object replacement (fifo_corrupt_transaction) to inject specific data patterns without modifying testbench source code.
+* **Dual Active Agents**: Independent write and read agents, each containing a Sequencer, Driver, and Monitor.
+* **Constrained-Random Verification (CRV)**: Randomized read/write transactions with configurable delays.
+* **Self-Checking Scoreboard**: Queue-based reference model that verifies data integrity and FIFO ordering through UVM TLM analysis ports and FIFOs.
+* **Functional Coverage**: Transaction-level stimulus coverage and interface-level FIFO behavior coverage.
+* **SystemVerilog Assertions (SVA)**: Checks reset behavior, full/empty consistency, and overflow/underflow protection. Additional assertions use bind to monitor internal read/write pointers without modifying the RTL.
+* **Factory Type Override**: Demonstrates transaction replacement using fifo_corrupt_transaction.
 
 ## Components
 * **fifo_sequencer**: Controls transaction flow and moves sequence items to drivers.
 * **fifo_write/read_driver**: Converts TLM transactions into physical signals to drive the DUT interface, while sending driving metrics to Coverage.
 * **fifo_write/read_monitor**: Passively captures bus activity, packages signals into transactions, and broadcasts them to the Scoreboard via TLM analysis ports.
 * **fifo_write/read_agent**: Encapsulates Sequencer, Driver, and Monitor into a reusable container.
-* **fifo_scoreboard**: Stores expected write transactions in a TLM FIFO and compares them against actual read output transactions to verify data integrity.
-* **fifo_coverage**: Collects functional coverage metrics for operation types and inter-transaction delays.
+* **fifo_scoreboard**: Compares actual read data against a queue-based reference model.
+* **fifo_coverage**: Collects stimulus and FIFO behavior coverage.
+* **fifo_assertion**: Checks internal pointer stability through SVA and bind.
 
 ## Test Cases
 * **fifo_rand_test**: Runs randomized transactions across write and read agents to stress FIFO operation and fill coverage bins with random timing delays (zero_delay, short_delay, long_delay).
 * **fifo_full_empty_test**: Directed test driving boundary condition sequences to verify FIFO overflow and underflow protections.
 * **fifo_override_test**: Uses UVM Factory Type Override to inject custom data patterns and fixed delays without altering existing testbench settings.
+* **fifo_reset_test**: Reset recovery after writing data into the FIFO.
+* **fifo_full_simultaneous_test**: Simultaneous read/write requests while FIFO is full.
 
 ## Verification Results
-### 1. Data Integrity & Scoreboard Checking
-The dynamic self-checking scoreboard verified the correctness of data flow across all test cases:
-* **Zero Data Mismatch**: 100% data integrity verified for all popped transactions against the expected golden queue.
-* **In-Order Delivery**: Confirmed strict FIFO order with zero protocol or data corruption under random read/write delays.
-* **Drain & Boundary Verification**: Confirmed complete FIFO drain (zero residual data) and verified correct `full`/`empty` flag behavior during the directed `fifo_full_empty_test`.
-* **Zero UVM Errors**: Successfully passed all randomized and directed tests with 0 `UVM_ERROR` and 0 `UVM_FATAL` reports.
-### 2. Functional Coverage
-The testbench achieved **100.00% Functional Coverage**:
-* `cp_op` (**100.00%**): Fully covered both `write_op` and `read_op` transactions.
-* `cp_delay` (**100.00%**): Verified all timing delay bins (zero_delay, short_delay, and long_delay).
-* `cross_op_delay` (**100.00%**): Achieved 100% coverage across all cross-bins between operation types and delay conditions.
+### 1. Data Integrity 
+The scoreboard uses an in-order reference queue to predict expected read data and compare it against actual DUT output.
+* **Zero Data Mismatches**: All observed read transactions matched the expected data from the reference queue.
+* **FIFO Ordering**: Verified in-order data delivery under randomized and directed read/write scenarios.
+* **Reset Recovery**: Verified correct data transactions after mid-test reset.
+* **Regression**: All five test cases completed with zero reported data mismatches.
+  
+### 2. Coverage
+* **Code Coverage**: 100%
+* **Functional Coverage**: 100%
+Functional coverage includes transaction types, delay combinations, FIFO status, and simultaneous read/write scenarios.
 
 ## How to Run
-**Requirements**
+### Requirements
+- Synopsys VCS with UVM support
+- Synopsys URG for coverage reporting
+
+### Run all tests
+```bash
+  make all
+```
+### Run an individual test
+```bash
+  make TEST=fifo_rand_test
+```
+### Generate coverage report
+```bash
+  make cov
+```
+### Clean generated files
+```bash
+  make clean
+```
+
+The Makefile compiles the testbench once and executes the regression tests sequentially, collecting coverage data for each test.
+
+**Tools**
+* SystemVerilog / UVM
 * Synopsys VCS
-* UVM Library
-
-## Execution Commands
-
-```Bash
-# 1. Run randomized test
-make
-
-# 2. Run full/empty boundary test
-make TEST=fifo_full_empty_test
-
-# 3. Run test with UVM Factory Override
-make TEST=fifo_override_test
-
-# 4. Generate coverage report
-make cov
+* Synopsys Verdi
+* Synopsys URG
+* GNU Make
