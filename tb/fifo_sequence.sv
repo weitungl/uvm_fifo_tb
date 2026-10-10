@@ -23,6 +23,33 @@ class fifo_base_sequence extends uvm_sequence #(fifo_transaction);
             `uvm_fatal("SEQ", "Randomization failed")
         finish_item(req);
     endtask
+
+    task write_data_no_delay(input bit [DATA_WIDTH-1:0] data);
+        req = fifo_transaction::type_id::create("req");
+        start_item(req);
+
+        if (!req.randomize() with {
+            op == WRITE_ONLY;
+            this.data == data;
+            delay == 0;
+        })
+            `uvm_fatal("SEQ", "Randomization failed")
+
+        finish_item(req);
+    endtask
+
+    task read_data_no_delay();
+        req = fifo_transaction::type_id::create("req");
+        start_item(req);
+
+        if (!req.randomize() with {
+            op == READ_ONLY;
+            delay == 0;
+        })
+            `uvm_fatal("SEQ", "Randomization failed")
+
+        finish_item(req);
+    endtask
 endclass
 
 // Sequence 1
@@ -83,3 +110,27 @@ class fifo_empty_read_seq extends fifo_base_sequence;
     endtask
 endclass
 
+// Sequence 3 (trigger no-delay write and read)
+class fifo_no_delay_write_seq extends fifo_base_sequence;
+    `uvm_object_utils(fifo_no_delay_write_seq)
+
+    function new(string name = "fifo_no_delay_write_seq");
+        super.new(name);
+    endfunction
+
+    virtual task body();
+        write_data_no_delay($urandom());
+    endtask
+endclass
+
+class fifo_no_delay_read_seq extends fifo_base_sequence;
+    `uvm_object_utils(fifo_no_delay_read_seq)
+
+    function new(string name = "fifo_no_delay_read_seq");
+        super.new(name);
+    endfunction
+
+    virtual task body();
+        read_data_no_delay();
+    endtask
+endclass

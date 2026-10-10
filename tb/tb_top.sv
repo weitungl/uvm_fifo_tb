@@ -4,23 +4,20 @@ import uvm_pkg::*;
 
 module tb_top;
     bit clk;
-    bit rst_n;
 
     initial begin
         clk = 0;
         forever #5ns clk = ~clk;
     end
 
-    initial begin
-        rst_n = 0;
-        #20ns;
-        rst_n = 1;
-    end
 
     fifo_if vif(
-        .clk(clk),
-        .rst_n(rst_n)
+        .clk(clk)
     );
+
+    initial begin
+        vif.trigger_reset(2);
+    end
 
     fifo #(
         .DATA_WIDTH(fifo_pkg::DATA_WIDTH),

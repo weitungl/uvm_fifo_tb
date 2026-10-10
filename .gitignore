@@ -1,14 +1,20 @@
-cat << 'EOF' > .gitignore
+# VCS & Simulation
+simv
+simv.daidir/
 csrc/
-simv*
-*.daidir/
-*.key
-*.vpd
-*.vcd
-*.fsdb
-*.log
-ucli.key
 vc_hdrs.h
-.vlogan*
-.vcs*
-EOF
+ucli.key
+*.log
+
+# Coverage Data & Reports
+simv.vdb/
+cov_report/
+cm.log
+
+# Verdi GUI & Temporary files
+vdCovLog/
+vdCov.conf
+novas.rc
+novas.conf
+*.fsdb
+.fsm.*

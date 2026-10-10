@@ -10,6 +10,8 @@ class fifo_scoreboard extends uvm_scoreboard;
 
     fifo_transaction ref_queue[$];
 
+    virtual fifo_if vif;
+
     int pass_count = 0;
     int fail_count = 0;
 
@@ -19,6 +21,8 @@ class fifo_scoreboard extends uvm_scoreboard;
     // build
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
+        if(!uvm_config_db#(virtual fifo_if)::get(this, "", "vif", vif))
+            `uvm_fatal("NOVIF", "Virtual interface not found in scoreboard")
         write_export    = new("write_export", this);
         read_export     = new("read_export", this);
         write_fifo      = new("write_fifo", this);
@@ -35,6 +39,7 @@ class fifo_scoreboard extends uvm_scoreboard;
         fork 
             process_write();
             process_read();
+            monitor_reset();
         join
     endtask
 
@@ -71,6 +76,23 @@ class fifo_scoreboard extends uvm_scoreboard;
                                               exp_tr.data, r_tr.data))
                 end
             end
+        end
+    endtask
+
+    virtual task monitor_reset();
+        fifo_transaction tr;
+
+        forever begin
+            @(negedge vif.rst_n);
+
+            ref_queue.delete();
+
+            // Clear pending write transactions
+            while (write_fifo.try_get(tr));
+            // Clear pending read transactions
+            while (read_fifo.try_get(tr));
+
+            `uvm_info("SCB_RESET", "Reference queue and analysis FIFOs cleared", UVM_LOW)
         end
     endtask
 
