@@ -44,29 +44,43 @@ The scoreboard uses an in-order reference queue to predict expected read data an
 
 Functional coverage includes transaction types, delay combinations, FIFO status, and simultaneous read/write scenarios.
 
+### 3. Assertion Verification
+* Verified FIFO reset behavior and full/empty consistency.
+* Checked overflow and underflow protection using SVA and bound internal pointer assertions.
+* No assertion failures observed during regression.
+
 ## How to Run
+
 ### Requirements
 - Synopsys VCS with UVM support
 - Synopsys URG for coverage reporting
 
-### Run all tests
+### Run All Tests
+Compile the testbench and run all five tests.
+
 ```bash
-  make all
-```
-### Run an individual test
-```bash
-  make TEST=fifo_rand_test
-```
-### Generate coverage report
-```bash
-  make cov
-```
-### Clean generated files
-```bash
-  make clean
+make all
 ```
 
-The Makefile compiles the testbench once and executes the regression tests sequentially, collecting coverage data for each test.
+### Run an Individual Test
+Compile and run a specific test.
+
+```bash
+make compile
+make sim TEST=fifo_rand_test
+```
+
+### Generate Coverage Report
+```bash
+make cov
+```
+
+### Clean Generated Files
+```bash
+make clean
+```
+
+The Makefile automates compilation and test execution. The regression runs all five tests sequentially, with coverage collected separately for each test and merged for reporting.
 
 **Tools**
 * SystemVerilog / UVM
