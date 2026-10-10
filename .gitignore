@@ -1,17 +1,12 @@
-# VCS & Simulation
 simv
 simv.daidir/
 csrc/
 vc_hdrs.h
 ucli.key
 *.log
-
-# Coverage Data & Reports
 simv.vdb/
 cov_report/
 cm.log
-
-# Verdi GUI & Temporary files
 vdCovLog/
 vdCov.conf
 novas.rc
